@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from importlib import resources
 from typing import List
@@ -45,7 +46,7 @@ def get_concrete_value(string):
         if "Word" in string:
             return "<W>"
         return "<T>"
-    conclusion = string[string.find('"') + 1 : len(string) - 1]
+    conclusion = string[string.find('"') + 1: len(string) - 1]
     return conclusion
 
 
@@ -98,7 +99,7 @@ def get_condition(str_condition: str) -> FWObject:
     condition = FWObject(False)
     for rule in str_condition.split(" and "):
         rule = rule.rstrip()
-        key = rule[rule.find(".") + 1 : rule.find(" ")]
+        key = rule[rule.find(".") + 1: rule.find(" ")]
         value = get_concrete_value(rule)
         if key in key_to_position_dict:
             condition.context[key_to_position_dict[key]] = value
@@ -128,7 +129,7 @@ def get_object(word_tags: List[WordTag], size: int, index: int):
     return fw_object
 
 
-import pickle
+import pickle5 as pickle
 import logging
 
 
@@ -230,9 +231,9 @@ class WordSegmenter:
             token = tokens[i]
             if all(character.isalpha() for character in token):
                 if (
-                    token[0].islower()
-                    and (i + 1) < len(tokens)
-                    and tokens[i + 1][0].isupper()
+                        token[0].islower()
+                        and (i + 1) < len(tokens)
+                        and tokens[i + 1][0].isupper()
                 ):
                     word_tags.append(WordTag(token, "B"))
                     i += 1
@@ -242,9 +243,9 @@ class WordSegmenter:
                 for j in range(min(i + 4, len(tokens)), i + 1, -1):
                     word = " ".join(lower_tokens[i:j])
                     if (
-                        word in self.vocabulary.vn_dict
-                        or word in self.vocabulary.vn_locations
-                        or word in self.vocabulary.country_l_name
+                            word in self.vocabulary.vn_dict
+                            or word in self.vocabulary.vn_locations
+                            or word in self.vocabulary.country_l_name
                     ):
                         word_tags.append(WordTag(token, "B"))
                         for k in range(i + 1, j):
@@ -255,11 +256,11 @@ class WordSegmenter:
                 if is_single_syllable:
                     lower_cased_token = lower_tokens[i]
                     if (
-                        lower_cased_token in self.vocabulary.vn_first_sent_words
-                        or token[0].islower()
-                        or all(character.isupper() for character in token)
-                        or lower_cased_token in self.vocabulary.country_s_name
-                        or lower_cased_token in self.vocabulary.world_company
+                            lower_cased_token in self.vocabulary.vn_first_sent_words
+                            or token[0].islower()
+                            or all(character.isupper() for character in token)
+                            or lower_cased_token in self.vocabulary.country_s_name
+                            or lower_cased_token in self.vocabulary.world_company
                     ):
                         word_tags.append(WordTag(token, "B"))
                         i += 1
@@ -268,22 +269,22 @@ class WordSegmenter:
                     for i_lower in range(i + 1, min(i + 4, len(tokens))):
                         n_token = tokens[i_lower]
                         if (
-                            n_token[0].islower()
-                            or not all(character.isalpha() for character in n_token)
-                            or n_token == "LBKT"
-                            or n_token == "RBKT"
+                                n_token[0].islower()
+                                or not all(character.isalpha() for character in n_token)
+                                or n_token == "LBKT"
+                                or n_token == "RBKT"
                         ):
                             break
                     if i_lower > i + 1:
                         is_not_middlename = True
                         if (
-                            lower_cased_token in self.vocabulary.vn_middle_names
-                            and i >= 1
+                                lower_cased_token in self.vocabulary.vn_middle_names
+                                and i >= 1
                         ):
                             prev_t = tokens[i - 1]
                             if (
-                                prev_t[0].isupper()
-                                and prev_t.lower() in self.vocabulary.vn_family_names
+                                    prev_t[0].isupper()
+                                    and prev_t.lower() in self.vocabulary.vn_family_names
                             ):
                                 word_tags.append(WordTag(token, "I"))
                                 is_not_middlename = False
@@ -317,11 +318,31 @@ class WordSegmenter:
                     current_node = current_node.if_not_node
         return fired_node
 
-    def segment_tokenized_string(self, string: str):
-        result = ""
+    def segment_string_to_token(self, string: str):
+        string = re.sub(r"(\S)([,.])", r"\1 \2", string)
         line = string.rstrip()
         if not line:
-            return "\n"
+            return os.linesep
+        word_tags: List[WordTag] = self.get_initial_segmentation(line)
+        current_token = ""
+        results = []
+        for word_tag in word_tags:
+            if word_tag.tag == 'I':
+                current_token = '_'.join([current_token, word_tag.form])
+            elif word_tag.tag == 'B':
+                if current_token:
+                    results.append(current_token)
+                current_token = word_tag.form
+        if current_token:
+            results.append(current_token)
+        return results
+
+    def segment_tokenized_string(self, string: str):
+        result = ""
+        string = re.sub(r"(\S)([,.])", r"\1 \2", string)
+        line = string.rstrip()
+        if not line:
+            return None
         word_tags: List[WordTag] = self.get_initial_segmentation(line)
         size = len(word_tags)
         for i, word_tag in enumerate(word_tags):
@@ -337,10 +358,12 @@ class WordSegmenter:
                     result += " " + word_tag.form
                 else:
                     result += "_" + word_tag.form
-        return result.rstrip()
+        return result.strip()
 
 
-y_ = "Ông Nguyễn Khắc Chúc đang làm việc tại Đại học Quốc gia Hà Nội. Bà Lan, vợ ông Chúc, cũng làm việc tại đây. Nếu có ước muốn cho cuộc đời, hãy nhớ ước muốn cho thời gian trở lại"
-segmenter = WordSegmenter()
-for string in y_.split("."):
-    print(segmenter.segment_tokenized_string(string.strip()))
+#
+# y_ = "Ông Nguyễn Khắc Chúc đang làm việc tại Đại học Quốc gia Hà Nội. Bà Lan, vợ ông Chúc, cũng làm việc tại đây. Nếu có ước muốn cho cuộc đời, hãy nhớ ước muốn cho thời gian trở lại"
+# y_ = "Tôn Ngộ Không phò Đường Tăng đi thỉnh kinh tại Tây Trúc"
+# segmenter = WordSegmenter()
+# for string in y_.split("."):
+#     print(segmenter.segment_string_to_token(string.strip()))

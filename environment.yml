@@ -1,0 +1,47 @@
+name: thesis-nlp-project
+channels:
+  - intel
+  - defaults
+dependencies:
+  - fairseq
+  - fatsbpe
+  - vncorenlp
+  - transformers
+  - bzip2=1.0.8=vc14h53ad9d4_9
+  - ca-certificates=2021.10.26=haa95532_2
+  - certifi=2021.10.8=py37haa95532_0
+  - dill=0.3.4=pyhd3eb1b0_0
+  - dpcpp-cpp-rt=2022.0.0=intel_3663
+  - dpcpp_cpp_rt=2022.0.0=intel_3663
+  - icc_rt=2022.0.0=intel_3663
+  - intel-cmplr-lib-rt=2022.0.0=intel_3663
+  - intel-cmplr-lic-rt=2022.0.0=intel_3663
+  - intel-opencl-rt=2022.0.0=intel_3663
+  - intel-openmp=2022.0.0=intel_3663
+  - intelpython=2022.0.0=0
+  - locket=0.2.1=py37haa95532_2
+  - mkl=2022.0.0=intel_115
+  - mkl-service=2.4.0=py37h9dd93ce_11
+  - mkl_fft=1.3.1=py37hd8013da_7
+  - mkl_random=1.2.2=py37he911e3a_7
+  - mkl_umath=0.1.1=py37h4dc28bd_17
+  - numpy=1.21.2=py37hec4e512_7
+  - numpy-base=1.21.2=py37h54dbe16_7
+  - openssl=1.1.1l=h2bbff1b_0
+  - partd=1.2.0=pyhd3eb1b0_1
+  - pip=21.2.4=py37haa95532_0
+  - python=3.7.11=h46f45cd_6
+  - setuptools=58.0.4=py37haa95532_0
+  - six=1.16.0=py37_0
+  - sqlite=3.36.0=vc14h53ad9d4_3
+  - tbb=2021.5.0=vc14_intel_714
+  - tbb4py=2021.5.0=py37_intel_714
+  - tk=8.6.10=he774522_3
+  - toolz=0.11.2=pyhd3eb1b0_0
+  - vc=14.2=h21ff451_1
+  - vs2015_runtime=14.27.29016=h5e58377_2
+  - wheel=0.37.0=pyhd3eb1b0_1
+  - wincertstore=0.2=py37_4
+  - xz=5.2.5=h1ce30a1_2
+  - zlib=1.2.11.1=vc14hc1c5f5b_5
+prefix: C:\Users\admin\anaconda3\envs\thesis-nlp-project
